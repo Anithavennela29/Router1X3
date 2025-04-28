@@ -1,0 +1,21 @@
+
+class router_scoreboard extends uvm_scoreboard;
+
+    `uvm_component_utils(router_scoreboard)
+
+
+    extern function new(string name = "router_scoreboard",uvm_component parent);
+    extern function void build_phase(uvm_phase phase);
+
+endclass 
+
+//constructor new method
+function router_scoreboard::new(string name = "router_scoreboard",uvm_component parent);
+    super.new(name,parent);
+endfunction
+
+//build phase of router scoreboard
+function void router_scoreboard::build_phase(uvm_phase phase);
+    `uvm_info("INFO","This is the build phase of router scoreboard",UVM_LOW)
+    super.build_phase(phase);
+endfunction 
