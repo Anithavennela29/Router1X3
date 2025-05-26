@@ -1,4 +1,4 @@
-class source_agent_sequencer extends uvm_sequencer;
+class source_agent_sequencer extends uvm_sequencer #(source_xtn);
 
 `uvm_component_utils(source_agent_sequencer)
 

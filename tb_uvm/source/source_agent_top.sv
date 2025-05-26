@@ -6,7 +6,7 @@ tb_config m_cfg;
 
 source_agent src_agt[];
 
-source_agent_config src_cfg;
+source_agent_config src_cfg[];
 
 extern function new(string name="source_agent_top",uvm_component parent);
 extern function void build_phase(uvm_phase phase);
