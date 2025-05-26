@@ -3,7 +3,7 @@ module top();
 import uvm_pkg::*;
 import router_pkg::*;
 
-`include "uvm_macros.svh"
+//`include "router_assertions.sv"
 
 bit clock;
 
@@ -31,7 +31,12 @@ router DUV(.clock(clock),
 		.err(src_if0.error),
 		.busy(src_if0.busy));
 
-
+/*bind router router_assertions bind_inst(
+  .clock(clock),
+  .pkt_valid(src_if0.pkt_valid),
+  .busy(src_if0.busy),
+  .data_in(src_if0.data_in)
+);*/
 
 
 initial 
@@ -48,99 +53,49 @@ begin
 	uvm_config_db #(virtual router_if) :: set(null,"*","dst_if2",dst_if2);
 	
 	//uvm_top.enable_print_topology = 1;
-	run_test();
+	
+        run_test();
 end
 
 
-/*
-
-
-property pkt_valid;
-@(posedge clock) $rose(sif.pkt_valid) |=> sif.busy;
+property pkt_valid_p;
+  @(posedge clock) $rose(src_if0.pkt_valid) |=> src_if0.busy;
 endproperty
 
-PKT_VALID : cover property (pkt_valid);
-
-
-property busy;
-@(posedge clock) sif.busy |-> $stable(sif.data_in);
+ property busy_p;
+  @(posedge clock) src_if0.busy |=> $stable(src_if0.data_in);
 endproperty
 
-BUSY: cover property (busy);
+     property read_enb0;
+        @(posedge clock) (dst_if0.valid_out) |=> ##[1:29] (dst_if0.read_enb);
+    endproperty 
+
+    property read_enb1;
+        @(posedge clock) (dst_if1.valid_out) |=> ##[1:29] (dst_if1.read_enb);
+    endproperty 
+
+    property read_enb2;
+        @(posedge clock) (dst_if2.valid_out) |=> ##[1:29] (dst_if2.read_enb);
+    endproperty 
+
+// Assert the property in the code
+A1:assert property (pkt_valid_p)else
+  $error("Assertion failed: pkt_valid rose but busy was not asserted");
 
 
-property pkt_valid_valid_out;
-@(posedge clock) $rose(sif.pkt_valid) |-> if(sif.data_in[1:0]==0)
-						##3 dif0.valid_out;
-					else if(sif.data_in[1:0]==1)
-						##3 dif1.valid_out;
-					else if(sif.data_in[1:0]==2)
-						##3 dif2.valid_out;
-endproperty
-
-VALID_OUT : cover property (pkt_valid_valid_out);
-
-
-
-property pkt_valid0;
-	@(posedge clock) $rose(sif.pkt_valid) && (sif.data_in[1:0]==0) |-> ##3 dif0.valid_out;
-endproperty
-PKT_VALID_VALID_OUT_0 : cover property (pkt_valid0);
-
-property pkt_valid1;
-	@(posedge clock) $rose(sif.pkt_valid) && (sif.data_in[1:0]==1) |-> ##3 dif1.valid_out;
-endproperty
-PKT_VALID_VALID_OUT_1 : cover property (pkt_valid1);
-
-property pkt_valid2;
-	@(posedge clock) $rose(sif.pkt_valid) && (sif.data_in[1:0]==2) |-> ##3 dif2.valid_out;
-endproperty
-PKT_VALID_VALID_OUT_2 : cover property (pkt_valid2);
+  A2:assert property (busy_p)  else
+  $error("Assertion failed: busy asserted but data_in changed");
 
 
 
+   /* A4 : assert property(read_enb0) else
+         $display("Assertions is not successfull for read_enb0");
 
-property valid_out_0;
-	@(posedge clock) $rose(dif0.valid_out) |=> ##[0:30] dif0.read_enb;
-endproperty
+    A5 : assert property(read_enb1)else
+          $display("Assertions is not successfull for read_enb1");
 
-VALID_OUT_0 : cover property (valid_out_0);
-
-property valid_out_1;
-	@(posedge clock) $rose(dif1.valid_out) |=> ##[0:30] dif1.read_enb;
-endproperty
-
-VALID_OUT_1 : cover property (valid_out_1);
-
-
-property valid_out_2;
-	@(posedge clock) $rose(dif2.valid_out) |=> ##[0:30] dif2.read_enb;
-endproperty
-
-VALID_OUT_2 : cover property (valid_out_2);
-
-
-property read_enb_0;
-@(posedge clock) $fell(dif0.valid_out) |=> $fell(dif0.read_enb);
-endproperty
-
-READ_ENB_0: cover property (read_enb_0);
-
-
-property read_enb_1;
-@(posedge clock) $fell(dif1.valid_out) |=> $fell(dif1.read_enb);
-endproperty
-
-READ_ENB_1: cover property (read_enb_1);
-
-
-property read_enb_2;
-@(posedge clock) $fell(dif2.valid_out) |=> $fell(dif2.read_enb);
-endproperty
-
-READ_ENB_2: cover property (read_enb_2);
-
-*/
+    A6 : assert property(read_enb2)  else
+           $display("Assertions is not successfull for read_enb2");*/
 
 endmodule
 

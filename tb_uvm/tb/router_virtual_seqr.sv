@@ -29,9 +29,7 @@ function void router_virtual_seqr::build_phase(uvm_phase phase);
 
 	if(!uvm_config_db #(tb_config)::get(this,"","m_cfg",m_cfg))
 	    `uvm_fatal("CONFIG","cannot get() env cfg from uvm_config_db. Have you set() it?")
-    // LAB : Create dynamic array handles source and destination agent sequencers equal to
-	// the config parameter no_of_source and destination agents
-	src_agt_seqr = new[m_cfg.no_of_src_agents];
+   	src_agt_seqr = new[m_cfg.no_of_src_agents];
 	dst_agt_seqr = new[m_cfg.no_of_dst_agents];
 
 endfunction
